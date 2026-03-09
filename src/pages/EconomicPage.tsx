@@ -1,4 +1,3 @@
-import AppHeader from '@/components/AppHeader';
 import MetricCard from '@/components/MetricCard';
 import { economicIndicators, monthlyTrendData } from '@/data/mockData';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
@@ -8,8 +7,7 @@ import { motion } from 'framer-motion';
 export default function EconomicPage() {
   return (
     <div className="min-h-screen">
-      <AppHeader title="Economic Data" subtitle="INDRA CORE — Macro-economic signals from RBI, MOSPI, NSO, and market feeds" />
-      <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {economicIndicators.map((ind, i) => (
             <motion.div

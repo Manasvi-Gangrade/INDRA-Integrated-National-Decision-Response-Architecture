@@ -1,4 +1,3 @@
-import AppHeader from '@/components/AppHeader';
 import { schemeMetrics } from '@/data/mockData';
 import { motion } from 'framer-motion';
 import { Progress } from '@/components/ui/progress';
@@ -6,8 +5,7 @@ import { Progress } from '@/components/ui/progress';
 export default function SchemesPage() {
   return (
     <div className="min-h-screen">
-      <AppHeader title="Scheme Tracking" subtitle="INDRA PILOT — Central scheme implementation status across all states and UTs" />
-      <div className="p-6 space-y-4">
+            <div className="p-6 space-y-4">
         {schemeMetrics.map((scheme, i) => (
           <motion.div
             key={scheme.schemeName}

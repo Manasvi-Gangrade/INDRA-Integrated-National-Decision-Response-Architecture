@@ -38,7 +38,7 @@ const IntelligenceEngine = () => {
         <h1 className="font-heading text-2xl font-bold flex items-center gap-2">
           <Brain className="w-6 h-6 text-primary" /> INDRA CORE — Intelligence Engine
         </h1>
-        <p className="text-sm text-muted-foreground">Global ontology engine connecting government data sources</p>
+        <p className="text-sm font-bold text-slate-500 bg-slate-100 inline-block px-3 py-1 rounded-full mt-2">Powered by Global Ontology Engine</p>
       </div>
 
       {/* Knowledge Graph Preview */}
@@ -112,8 +112,8 @@ const IntelligenceEngine = () => {
           <AlertTriangle className="w-4 h-4 text-accent" /> Alert Engine Monitor
         </h3>
         <div className="grid md:grid-cols-2 gap-3">
-          <AlertCard title="Climate-Agriculture Nexus Alert" location="Eastern India" source="IMD + Crop yield models" action="Activate crop insurance protocols" severity="critical" time="10 min ago" />
-          <AlertCard title="Economic Signal Detected" location="Western Maharashtra" source="Mandi price correlation" action="Monitor supply chain disruption" severity="warning" time="25 min ago" />
+          <AlertCard title="Climate-Agriculture Nexus Alert" location="Eastern India" source="IMD + Crop yield models" action="Activate crop insurance protocols" severity="critical" time="10 min ago" confidence={94} />
+          <AlertCard title="Economic Signal Detected" location="Western Maharashtra" source="Mandi price correlation" action="Monitor supply chain disruption" severity="warning" time="25 min ago" confidence={87} />
         </div>
       </div>
     </div>

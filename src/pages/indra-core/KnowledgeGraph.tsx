@@ -2,7 +2,7 @@ import { Network, Search, ZoomIn, Filter, Database, Activity, Sparkles, RefreshC
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type EntityType = "Policy" | "Location" | "Organization" | "Event" | "Indicator" | "Person";
+type EntityType = "Policy" | "Location" | "Organization" | "Event" | "Indicator" | "Geopolitics" | "Defense" | "Technology";
 
 const INITIAL_ENTITIES = [
   { id: 1, name: "PM-KISAN", type: "Policy" as EntityType, x: 50, y: 30, connections: [2, 3, 5] },
@@ -12,13 +12,17 @@ const INITIAL_ENTITIES = [
   { id: 5, name: "Rice Price Index", type: "Indicator" as EntityType, x: 40, y: 70, connections: [1, 3, 7] },
   { id: 6, name: "NDRF", type: "Organization" as EntityType, x: 65, y: 75, connections: [2, 4] },
   { id: 7, name: "Farmer Distress", type: "Indicator" as EntityType, x: 55, y: 45, connections: [4, 5] },
-  { id: 8, name: "Hon. Minister", type: "Person" as EntityType, x: 15, y: 30, connections: [3] },
+  { id: 8, name: "Hon. Minister", type: "Organization" as EntityType, x: 15, y: 30, connections: [3] },
+  { id: 9, name: "Global Supply Chain", type: "Geopolitics" as EntityType, x: 20, y: 80, connections: [5, 12] },
+  { id: 10, name: "Border Security", type: "Defense" as EntityType, x: 85, y: 85, connections: [2, 11] },
+  { id: 11, name: "UAV Surveillance", type: "Technology" as EntityType, x: 90, y: 35, connections: [4, 10] },
+  { id: 12, name: "Trade Embargo", type: "Geopolitics" as EntityType, x: 10, y: 65, connections: [9] },
 ];
 
 const NEW_ENTITIES = [
-  { id: 9, name: "Social Sentiment", type: "Indicator" as EntityType, x: 85, y: 40, connections: [4, 7] },
-  { id: 10, name: "Relief Fund", type: "Policy" as EntityType, x: 60, y: 15, connections: [2, 6] },
-  { id: 11, name: "Brahmaputra", type: "Location" as EntityType, x: 90, y: 70, connections: [4, 2] }
+  { id: 13, name: "Social Sentiment", type: "Indicator" as EntityType, x: 85, y: 40, connections: [4, 7] },
+  { id: 14, name: "Relief Fund", type: "Policy" as EntityType, x: 60, y: 15, connections: [2, 6] },
+  { id: 15, name: "Brahmaputra", type: "Location" as EntityType, x: 90, y: 70, connections: [4, 2] }
 ];
 
 const TYPE_COLORS: Record<EntityType, string> = {
@@ -27,7 +31,9 @@ const TYPE_COLORS: Record<EntityType, string> = {
   Organization: "bg-accent text-accent-foreground border-accent/50 shadow-accent/20",
   Event: "bg-destructive text-destructive-foreground border-destructive/50 shadow-destructive/20",
   Indicator: "bg-teal-500 text-white border-teal-500/50 shadow-teal-500/20",
-  Person: "bg-indra-purple text-white border-indra-purple/50 shadow-indra-purple/20",
+  Geopolitics: "bg-indigo-500 text-white border-indigo-500/50 shadow-indigo-500/20",
+  Defense: "bg-slate-700 text-white border-slate-700/50 shadow-slate-700/20",
+  Technology: "bg-cyan-500 text-white border-cyan-500/50 shadow-cyan-500/20",
 };
 
 export default function KnowledgeGraph() {
@@ -68,7 +74,9 @@ export default function KnowledgeGraph() {
           <h1 className="font-heading text-2xl font-bold flex items-center gap-2">
             <Network className="w-6 h-6 text-primary" /> Global Ontology Engine
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">Live visualization of INDRA's semantic knowledge graph</p>
+          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+            A unified intelligence graph collecting structured data, unstructured content, and live real-time feeds from geopolitics, economics, defense, technology, climate, and society.
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -158,7 +166,7 @@ export default function KnowledgeGraph() {
             {entities.map((e, index) => {
               const isSelected = selected === e.id;
               const isUnfocused = selected !== null && !isSelected;
-              const isNew = e.id > 8;
+              const isNew = e.id > 12;
 
               return (
                 <motion.button
@@ -256,8 +264,8 @@ export default function KnowledgeGraph() {
           ) : (
             <div className="indra-card p-8 flex flex-col items-center justify-center text-center text-muted-foreground flex-shrink-0 min-h-[250px] border-dashed border-2">
               <Network className="w-12 h-12 mb-4 opacity-20" />
-              <h3 className="font-bold text-foreground mb-1">Ontology Explorer</h3>
-              <p className="text-sm">Select any node on the graph to view its real-time semantic linkages and confidence scores.</p>
+              <h3 className="font-bold text-foreground mb-1">Global Ontology Explorer</h3>
+              <p className="text-sm">Select any node on the graph to view its real-time semantic linkages across domains for strategic insights.</p>
             </div>
           )}
 

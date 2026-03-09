@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import AppHeader from '@/components/AppHeader';
 import StatusBadge from '@/components/StatusBadge';
 import { stateRiskData, StateRiskData } from '@/data/mockData';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,8 +29,7 @@ export default function IndiaMapPage() {
 
   return (
     <div className="min-h-screen">
-      <AppHeader title="India Risk Map" subtitle="INDRA CORE — Interactive state-level risk assessment and governance intelligence" />
-      <div className="p-6">
+            <div className="p-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Map */}
           <div className="lg:col-span-2 bg-card rounded-xl border border-border p-6 shadow-card">

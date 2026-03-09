@@ -2,7 +2,7 @@ import MetricCard from "@/components/MetricCard";
 import { AlertCard } from "@/components/AlertCard";
 import { useState, useEffect } from "react";
 import { useRole } from "@/contexts/RoleContext";
-import { Users, Activity, AlertTriangle, TrendingUp, Wifi, FileText } from "lucide-react";
+import { Users, Activity, AlertTriangle, TrendingUp, Wifi, FileText, Image as ImageIcon } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 import indiaMap from "@/assets/india-map-bg.png";
 
@@ -197,6 +197,46 @@ const DashboardPage = () => {
             <p className="text-xs text-secondary mt-1">{m.change}</p>
           </div>
         ))}
+      </div>
+
+      {/* Visual Intelligence Reports - Using Unsplash placeholders for the uploaded concepts */}
+      <div className="indra-card p-5">
+        <h3 className="font-heading font-semibold text-sm mb-4 flex items-center gap-2">
+          <ImageIcon className="w-4 h-4 text-primary" /> Verified Visual Intelligence Reports
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="relative group overflow-hidden rounded-lg border border-border">
+            <img src="https://images.unsplash.com/photo-1620021665476-6d6ee47abcc6?w=600&h=400&fit=crop" alt="Citizen Grievance" className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8">
+              <p className="text-xs text-white font-bold leading-tight uppercase">Citizen Grievance Crisis: Resolution Delays</p>
+            </div>
+            <span className="absolute top-2 left-2 bg-destructive text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">CRITICAL</span>
+          </div>
+          
+          <div className="relative group overflow-hidden rounded-lg border border-border">
+            <img src="https://images.unsplash.com/photo-1464652149449-f3b8538144aa?w=600&h=400&fit=crop" alt="Assam Flood Crisis" className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8">
+              <p className="text-xs text-white font-bold leading-tight uppercase">Assam Flood Crisis: Thousands Displaced</p>
+            </div>
+            <span className="absolute top-2 left-2 bg-indra-red text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">LIVE - ASSAM</span>
+          </div>
+
+          <div className="relative group overflow-hidden rounded-lg border border-border">
+            <img src="https://images.unsplash.com/photo-1547621142-4fdfd8dc7fb7?w=600&h=400&fit=crop" alt="Kerala Floods 2018" className="w-full h-40 object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500" />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8">
+              <p className="text-xs text-white font-bold leading-tight uppercase">Kerala Floods 2018 - Response Analysis</p>
+            </div>
+            <span className="absolute top-2 left-2 bg-muted text-foreground text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">ARCHIVE</span>
+          </div>
+
+          <div className="relative group overflow-hidden rounded-lg border border-border">
+            <img src="https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?w=600&h=400&fit=crop" alt="Government Systems Overwhelmed" className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500" />
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8">
+              <p className="text-xs text-white font-bold leading-tight uppercase">Grievance System Overwhelmed</p>
+            </div>
+            <span className="absolute top-2 left-2 bg-secondary text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">REPORT</span>
+          </div>
+        </div>
       </div>
     </div>
   );

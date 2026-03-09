@@ -8,18 +8,10 @@ interface Message {
     text: string;
 }
 
-const INDRA_KNOWLEDGE = [
-    { keywords: ['indra core', 'core', 'ontology'], response: "INDRA CORE is our Global Ontology Engine. It connects all government data sources into a living, unified knowledge graph to detect risks and cross-domain correlations." },
-    { keywords: ['indra voice', 'voice', 'call'], response: "INDRA VOICE is our multilingual AI calling system. It can simultaneously process millions of citizen calls in 22+ local languages, classifying grievances and analyzing sentiment in real-time." },
-    { keywords: ['indra pilot', 'pilot', 'assistant', 'admin'], response: "INDRA PILOT is the Leader's Co-Pilot. It provides public administrators with instant briefings, speeches, constituency insights, and decision support powered by the National Knowledge Graph." },
-    { keywords: ['hi', 'hello', 'hey'], response: "Hello! I am the INDRA Assistant. I can tell you about our systems like INDRA CORE, VOICE, or PILOT. How can I help you today?" },
-    { keywords: ['what is indra', 'indra'], response: "INDRA (Integrated National Decision & Response Architecture) is a comprehensive AI platform designed to transform India's massive governance data into actionable intelligence." },
-];
-
 export default function IndraBot() {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
-        { id: '1', type: 'bot', text: 'Namaste! I am the INDRA AI Assistant. Ask me anything about our architecture (CORE, VOICE, PILOT).' }
+        { id: '1', type: 'bot', text: 'Namaste! I am the System Help Chatbot. Ask me how to navigate the platform, run simulations, or use the various AI modules (CORE, VOICE, PILOT).' }
     ]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -33,6 +25,31 @@ export default function IndraBot() {
         scrollToBottom();
     }, [messages, isTyping]);
 
+    const generateHelpResponse = (input: string) => {
+        const lowerInput = input.toLowerCase();
+        
+        if (lowerInput.includes('login') || lowerInput.includes('password')) {
+            return `To login to the system, navigate to the Command Center and enter your respective role credentials. As an admin, you can view all data; citizens have limited views.`;
+        }
+        if (lowerInput.includes('core') || lowerInput.includes('ontology')) {
+            return `The INDRA CORE is the Global Ontology Engine. It fuses structured and unstructured data from IMD, USGS, and News. You can view it by clicking on "Access Command Center" and then navigating to the Ontology Graph.`;
+        }
+        if (lowerInput.includes('voice') || lowerInput.includes('calls')) {
+            return `INDRA VOICE handles AI Citizen calls. Go to the "INDRA VOICE" module to see real-time grievance processing, sentiment analysis, and multilingual outbound campaigns.`;
+        }
+        if (lowerInput.includes('pilot') || lowerInput.includes('speech')) {
+            return `INDRA PILOT is the Leader Co-Pilot. It can auto-generate speeches and summarize PDF documents for you. Launch the "INDRA PILOT" module from the main page to use it.`;
+        }
+        if (lowerInput.includes('simulation') || lowerInput.includes('flood')) {
+            return `To see the system in action during a crisis, click "Run Simulation" on the main page. It will walk you through a simulated 4-step Assam Flood scenario.`;
+        }
+        if (lowerInput.includes('hi') || lowerInput.includes('hello')) {
+            return `Namaste! How can I assist you with using the INDRA platform today?`;
+        }
+
+        return `I'm a static help assistant focused on system navigation. Try asking me about 'core', 'voice', 'pilot', 'simulation', or 'login'.`;
+    };
+
     const handleSend = () => {
         if (!input.trim()) return;
 
@@ -41,21 +58,12 @@ export default function IndraBot() {
         setInput('');
         setIsTyping(true);
 
-        // Simulate AI response
+        // Simulate network delay for realism
         setTimeout(() => {
-            let botResponse = "I'm still learning! You can ask me about INDRA CORE, INDRA VOICE, or INDRA PILOT.";
-
-            const lowerInput = userMessage.toLowerCase();
-            for (const knowledge of INDRA_KNOWLEDGE) {
-                if (knowledge.keywords.some(kw => lowerInput.includes(kw))) {
-                    botResponse = knowledge.response;
-                    break;
-                }
-            }
-
-            setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), type: 'bot', text: botResponse }]);
+            const response = generateHelpResponse(userMessage);
+            setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), type: 'bot', text: response }]);
             setIsTyping(false);
-        }, 1500);
+        }, 800);
     };
 
     return (
@@ -92,8 +100,8 @@ export default function IndraBot() {
                                     <Bot className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h3 className="font-heading font-semibold text-sm">INDRA AI Assistant</h3>
-                                    <p className="text-[10px] text-white/80">Online & Ready</p>
+                                    <h3 className="font-heading font-semibold text-sm">System Help Chatbot</h3>
+                                    <p className="text-[10px] text-white/80">Support Guide</p>
                                 </div>
                             </div>
                             <button
@@ -115,7 +123,7 @@ export default function IndraBot() {
                                         }`}>
                                         {msg.type === 'user' ? <User className="w-3 h-3" /> : <Bot className="w-3 h-3" />}
                                     </div>
-                                    <div className={`p-3 rounded-2xl text-sm ${msg.type === 'user'
+                                    <div className={`p-3 rounded-2xl text-sm whitespace-pre-wrap ${msg.type === 'user'
                                             ? 'bg-primary text-primary-foreground rounded-tr-none'
                                             : 'bg-muted text-foreground rounded-tl-none border border-border/50'
                                         }`}>
@@ -149,7 +157,7 @@ export default function IndraBot() {
                                     type="text"
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
-                                    placeholder="Ask about INDRA..."
+                                    placeholder="How do I use this system?"
                                     className="flex-1 bg-muted border border-border rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-body"
                                 />
                                 <button

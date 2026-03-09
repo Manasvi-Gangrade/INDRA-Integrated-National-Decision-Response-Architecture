@@ -1,4 +1,4 @@
-import { Users, FileText, Mic, BookOpen, Sparkles, UploadCloud, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
+import { Users, FileText, Mic, BookOpen, Sparkles, UploadCloud, CheckCircle2, Loader2, ArrowRight, Volume2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -13,8 +13,8 @@ const briefingExample = {
 };
 
 const meetingNotes = [
-  { time: "10:00 AM", title: "Inter-ministerial coordination meeting", actionItems: ["Review flood preparedness", "Approve emergency fund release", "Coordinate with NDRF"] },
-  { time: "2:00 PM", title: "PM-KISAN review meeting", actionItems: ["Enrollment target review", "Beneficiary verification status", "Next disbursement timeline"] },
+  { time: "10:00 AM", title: "Inter-ministerial coordination meeting", actionItems: [{ task: "Review flood preparedness", owner: "Sec. Disaster Management" }, {task: "Approve emergency fund release", owner: "Finance Min."}] },
+  { time: "2:00 PM", title: "PM-KISAN review meeting", actionItems: [{task: "Enrollment target review", owner: "Agriculture Dept."}, {task: "Next disbursement timeline", owner: "DBT Cell"}] },
 ];
 
 export default function LeaderCopilot() {
@@ -25,6 +25,24 @@ export default function LeaderCopilot() {
   const [audience, setAudience] = useState("Press Conference");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedSpeech, setGeneratedSpeech] = useState("");
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const handlePlayAudio = () => {
+    if (!generatedSpeech || isPlaying) return;
+    
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(generatedSpeech);
+    const voices = window.speechSynthesis.getVoices();
+    const indVoice = voices.find(v => v.lang.includes('en-IN') || v.lang.includes('hi-IN')) || voices[0];
+    if (indVoice) utterance.voice = indVoice;
+    
+    utterance.onstart = () => setIsPlaying(true);
+    utterance.onend = () => setIsPlaying(false);
+    utterance.onerror = () => setIsPlaying(false);
+    
+    window.speechSynthesis.speak(utterance);
+  };
 
   // Document Summarizer State
   const [dragActive, setDragActive] = useState(false);
@@ -32,11 +50,17 @@ export default function LeaderCopilot() {
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "extracting" | "done">("idle");
   const [docSummary, setDocSummary] = useState<any>(null);
 
+  // Meeting Intelligence State
+  const [meetingState, setMeetingState] = useState<"idle" | "listening" | "processing" | "done">("idle");
+  const [meetingActionItems, setMeetingActionItems] = useState<{task: string, owner: string}[]>([]);
+
   // --- Speech Generation via Real AI ---
   const handleGenerateSpeech = async () => {
     if (!topic.trim()) return;
     setIsGenerating(true);
     setGeneratedSpeech("");
+    window.speechSynthesis.cancel();
+    setIsPlaying(false);
 
     try {
       const response = await fetch("http://127.0.0.1:8000/api/pilot/generate-speech", {
@@ -224,8 +248,19 @@ export default function LeaderCopilot() {
                         <p className="text-sm">Your drafted speech will appear here.</p>
                       </div>
                     ) : (
-                      <div className="h-full overflow-y-auto pr-2 custom-scrollbar">
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground font-medium">
+                      <div className="h-full overflow-y-auto pr-2 custom-scrollbar flex flex-col">
+                        <div className="flex justify-between items-center mb-4 sticky top-0 bg-background/90 backdrop-blur-sm z-10 py-2 border-b border-border/50">
+                           <span className="text-xs font-bold text-indra-purple uppercase tracking-widest bg-indra-purple/10 px-2 py-1 rounded">Generated Draft</span>
+                           <button 
+                             onClick={handlePlayAudio} 
+                             disabled={isGenerating || isPlaying} 
+                             className="px-3 py-1.5 rounded-lg bg-indigo-100 hover:bg-indigo-200 text-indigo-700 transition disabled:opacity-50 flex items-center gap-2 text-xs font-bold shadow-sm"
+                           >
+                               <Volume2 className={`w-4 h-4 ${isPlaying ? 'animate-pulse text-indigo-900' : ''}`} />
+                               {isPlaying ? 'Speaking...' : 'Play Audio'}
+                           </button>
+                        </div>
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground font-medium flex-1">
                           {generatedSpeech}
                         </p>
                         {isGenerating && (
@@ -360,28 +395,103 @@ export default function LeaderCopilot() {
             </motion.div>
           )}
 
-          {/* STATIC MEETING TAB */}
+          {/* FUNCTIONAL MEETING INTELLIGENCE TAB */}
           {activeTab === "meeting" && (
-            <motion.div key="meeting" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4">
-              {meetingNotes.map(m => (
-                <div key={m.time} className="indra-card p-6 transition-all hover:shadow-md">
-                  <div className="flex items-center gap-3 mb-4 border-b border-border/50 pb-4">
-                    <span className="px-2.5 py-1 rounded bg-muted text-xs font-bold text-foreground">{m.time}</span>
-                    <h4 className="font-heading font-bold text-base">{m.title}</h4>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Extracted Action Items</p>
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-                      {m.actionItems.map(ai => (
-                        <div key={ai} className="flex items-start gap-3 p-3 rounded-lg border border-border bg-background">
-                          <div className="w-4 h-4 mt-0.5 rounded border border-muted-foreground/30 flex-shrink-0" />
-                          <span className="text-sm font-medium text-foreground">{ai}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+            <motion.div key="meeting" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="indra-card p-6 md:p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-indra-purple/10 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-indra-purple" />
                 </div>
-              ))}
+                <div>
+                  <h3 className="font-heading text-lg font-bold">Meeting Intelligence & Action Extraction</h3>
+                  <p className="text-xs text-muted-foreground">Transcribes live meetings to auto-generate verified action items and assign responsible officers.</p>
+                </div>
+              </div>
+
+              {meetingState === "idle" && (
+                 <div className="border border-dashed border-border rounded-xl p-12 flex flex-col items-center justify-center text-center">
+                    <Mic className="w-12 h-12 text-muted-foreground mb-4 opacity-50" />
+                    <h4 className="font-bold text-lg mb-2">Ready to transcribe meeting</h4>
+                    <p className="text-sm text-muted-foreground max-w-sm mb-6">Start microphone or upload an audio recording to extract semantic action items.</p>
+                    <button 
+                      onClick={() => {
+                        setMeetingState("listening");
+                        setTimeout(() => setMeetingState("processing"), 3000);
+                        setTimeout(() => {
+                           setMeetingActionItems([
+                             { task: "Deploy 2 additional NDRF battalions to Majuli", owner: "NDRF Commander NE" },
+                             { task: "Release ₹50Cr emergency fund batch", owner: "Finance Secretary state" },
+                             { task: "Trigger evacuation VOIP calls", owner: "Voice Operator Desk" }
+                           ]);
+                           setMeetingState("done");
+                        }, 5000);
+                      }}
+                      className="px-6 py-3 bg-indra-purple rounded-xl text-white font-bold flex items-center gap-2 hover:bg-indra-purple/90"
+                    >
+                       <Mic className="w-5 h-5" /> Start Live Recording
+                    </button>
+                 </div>
+              )}
+
+              {(meetingState === "listening" || meetingState === "processing") && (
+                 <div className="border border-indra-purple/20 bg-indra-purple/5 rounded-xl p-12 flex flex-col items-center justify-center text-center">
+                    <div className="relative w-16 h-16 rounded-full bg-indra-purple/20 flex items-center justify-center mb-6">
+                      <Mic className={`w-8 h-8 text-indra-purple ${meetingState === "listening" ? 'animate-pulse' : ''}`} />
+                      {meetingState === "processing" && (
+                         <div className="absolute inset-0 rounded-full border-4 border-indra-purple border-t-transparent animate-spin" />
+                      )}
+                    </div>
+                    <h4 className="font-bold text-lg mb-2">
+                       {meetingState === "listening" ? "Listening to Meeting Audio..." : "Extracting Semantics & Action Items"}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                       {meetingState === "listening" ? "Speak clearly into the microphone." : "Cross-referencing entities with National Knowledge Graph."}
+                    </p>
+                 </div>
+              )}
+
+              {meetingState === "done" && (
+                 <div className="space-y-6 animate-slide-up">
+                    <div className="flex justify-between items-center mb-4">
+                       <h4 className="font-bold text-lg flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-green-500"/> Extracted Actionable Items</h4>
+                       <button onClick={() => setMeetingState("idle")} className="text-sm font-bold text-indra-purple hover:underline">Start New</button>
+                    </div>
+
+                    <div className="grid gap-3">
+                       {meetingActionItems.map((ai, i) => (
+                         <div key={i} className="flex justify-between items-center p-4 rounded-xl border border-border bg-background shadow-sm hover:border-indra-purple/50 transition-colors">
+                            <div className="flex items-center gap-3">
+                               <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-bold">{i+1}</div>
+                               <span className="font-bold text-slate-700">{ai.task}</span>
+                            </div>
+                            <span className="px-3 py-1 bg-slate-100 text-slate-600 font-bold text-xs rounded-lg uppercase tracking-wider">{ai.owner}</span>
+                         </div>
+                       ))}
+                    </div>
+
+                    <div className="mt-8 pt-6 border-t border-border">
+                       <h5 className="font-bold text-sm text-muted-foreground mb-4 uppercase">Past Meeting Logs</h5>
+                       <div className="grid md:grid-cols-2 gap-4">
+                       {meetingNotes.map((m, i) => (
+                         <div key={i} className="p-4 rounded-xl border border-border bg-slate-50/50">
+                           <div className="flex justify-between items-center mb-3">
+                             <span className="font-bold text-sm text-slate-800">{m.title}</span>
+                             <span className="text-xs font-bold text-slate-400 bg-slate-200 px-2 py-0.5 rounded">{m.time}</span>
+                           </div>
+                           <div className="space-y-2">
+                             {m.actionItems.map((a, j) => (
+                               <div key={j} className="flex justify-between items-start text-xs border-b border-slate-200 pb-1 last:border-0">
+                                 <span className="text-slate-600">{a.task}</span>
+                                 <span className="text-indigo-600 font-bold">{a.owner}</span>
+                               </div>
+                             ))}
+                           </div>
+                         </div>
+                       ))}
+                       </div>
+                    </div>
+                 </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

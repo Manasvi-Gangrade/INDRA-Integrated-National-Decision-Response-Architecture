@@ -1,4 +1,3 @@
-import AppHeader from '@/components/AppHeader';
 import { grievanceData, monthlyTrendData } from '@/data/mockData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { motion } from 'framer-motion';
@@ -17,8 +16,7 @@ export default function GrievancesPage() {
 
   return (
     <div className="min-h-screen">
-      <AppHeader title="Citizen Grievances" subtitle="INDRA VOICE — CPGRAMS, state portals, and district-level complaint aggregation" />
-      <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6">
         {/* Summary */}
         <div className="grid grid-cols-3 gap-4">
           {[

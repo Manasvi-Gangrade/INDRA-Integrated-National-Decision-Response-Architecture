@@ -5,9 +5,10 @@ interface AlertCardProps {
   action: string;
   severity: "critical" | "warning" | "info";
   time: string;
+  confidence?: number;
 }
 
-export function AlertCard({ title, location, source, action, severity, time }: AlertCardProps) {
+export function AlertCard({ title, location, source, action, severity, time, confidence }: AlertCardProps) {
   const severityStyles = {
     critical: "status-critical border-l-4 border-l-destructive",
     warning: "status-warning border-l-4 border-l-accent",
@@ -31,9 +32,16 @@ export function AlertCard({ title, location, source, action, severity, time }: A
         <p><span className="font-medium">Source:</span> {source}</p>
         <p><span className="font-medium">Action:</span> {action}</p>
       </div>
-      <span className={`inline-block mt-2 px-2 py-0.5 rounded text-[10px] font-semibold uppercase ${severityStyles[severity]}`}>
-        {labels[severity]}
-      </span>
+      <div className="flex items-center gap-2 mt-3">
+        <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${severityStyles[severity]}`}>
+          {labels[severity]}
+        </span>
+        {confidence && (
+          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+            Confidence: {confidence}%
+          </span>
+        )}
+      </div>
     </div>
   );
 }

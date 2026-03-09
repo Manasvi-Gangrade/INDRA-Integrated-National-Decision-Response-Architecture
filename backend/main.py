@@ -21,15 +21,15 @@ else:
     print("WARNING: GEMINI_API_KEY is not set in the environment variables.")
 
 # Initialize Model
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 app = FastAPI(title="INDRA Intelligence API")
 
 # Configure CORS for React Frontend (running on port 5173 by default)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -40,6 +40,10 @@ class SpeechRequest(BaseModel):
 
 class SentimentRequest(BaseModel):
     feedbacks: List[str]
+
+class ChatRequest(BaseModel):
+    message: str
+    history: List[dict] = []
 
 @app.get("/")
 def read_root():
@@ -226,3 +230,24 @@ async def analyze_sentiment(request: SentimentRequest):
     except Exception as e:
         print("Sentiment Analysis Error:", response.text if 'response' in locals() else str(e))
         raise HTTPException(status_code=500, detail="Failed to analyze sentiment. Check backend terminal for details.")
+
+@app.post("/api/chat")
+async def chat_with_indra(request: ChatRequest):
+    if not API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API Key is missing. Please configure backend/.env")
+    
+    prompt = f"""
+    You are INDRA, the Integrated National Decision & Response Architecture AI Assistant.
+    You are the voice of the Global Ontology Engine which tracks live data across geopolitics, economics, defense, climate, and society for India.
+    Keep your responses concise, sharp, and highly professional, like an AI briefing a top government official.
+    If the user asks about a current crisis (like Assam Floods or Farmer issues), invent realistic, data-driven simulated insights as if you are pulling from live sensors and satellite feeds.
+    
+    User Query: {request.message}
+    """
+    
+    try:
+        response = model.generate_content(prompt)
+        return {"response": response.text}
+    except Exception as e:
+        print("Chat Error:", str(e))
+        raise HTTPException(status_code=500, detail="Failed to generate AI response.")

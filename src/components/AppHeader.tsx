@@ -1,5 +1,5 @@
-import { Bell, Search, Clock, LogOut } from 'lucide-react';
-import { GoogleTranslateWidget } from './StandaloneTranslateTTS';
+import { Bell, Search, Clock, LogOut, Volume2, VolumeX } from 'lucide-react';
+import { GoogleTranslateWidget, useTTS } from './StandaloneTranslateTTS';
 import { useRole } from '@/contexts/RoleContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,6 +10,7 @@ interface AppHeaderProps {
 
 export default function AppHeader({ title, subtitle }: AppHeaderProps) {
   const { currentRole, getJurisdiction, logout } = useRole();
+  const { ttsEnabled, setTtsEnabled } = useTTS();
   const navigate = useNavigate();
   const now = new Date();
   const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
@@ -30,6 +31,13 @@ export default function AppHeader({ title, subtitle }: AppHeaderProps) {
         </div>
         <button className="relative p-2 rounded-lg hover:bg-muted transition-colors">
           <Search className="w-4 h-4 text-muted-foreground" />
+        </button>
+        <button 
+          onClick={() => setTtsEnabled(!ttsEnabled)}
+          className={`relative p-2 rounded-lg transition-colors ${ttsEnabled ? 'text-primary bg-primary/10 hover:bg-primary/20' : 'text-muted-foreground hover:bg-muted'}`}
+          title={ttsEnabled ? "Voice Enabled" : "Voice Disabled"}
+        >
+          {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
         </button>
         <button className="relative p-2 rounded-lg hover:bg-muted transition-colors">
           <Bell className="w-4 h-4 text-muted-foreground" />

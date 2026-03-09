@@ -1,10 +1,10 @@
-import AppHeader from '@/components/AppHeader';
 import MetricCard from '@/components/MetricCard';
 import StatusBadge from '@/components/StatusBadge';
 import { weatherAlerts, economicIndicators, grievanceData, schemeMetrics, monthlyTrendData, stateRiskData } from '@/data/mockData';
 import { AlertTriangle, TrendingUp, Users, FileBarChart, Shield, Activity } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { motion } from 'framer-motion';
+import IndiaMap from '@/components/IndiaMap';
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -21,9 +21,11 @@ export default function CommandCenter() {
 
   return (
     <div className="min-h-screen">
-      <AppHeader title="National Dashboard" subtitle="INDRA CORE — Master Intelligence View" />
-
       <div className="p-6 space-y-6">
+        <div className="mb-2">
+           <h1 className="text-2xl font-heading font-extrabold text-slate-800">National Situation Dashboard</h1>
+           <p className="text-sm text-slate-500">Real-time macro and micro intelligence overview (INDRA CORE)</p>
+        </div>
         {/* Top KPI Row */}
         <motion.div {...fadeUp} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <MetricCard
@@ -66,9 +68,17 @@ export default function CommandCenter() {
           />
         </motion.div>
 
+        {/* Live Geo-Spatial Map */}
+        <motion.div {...fadeUp} transition={{ delay: 0.05 }} className="bg-white/90 backdrop-blur-xl rounded-2xl border border-slate-200 p-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.06)] w-full mb-8 relative group">
+           <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur opacity-10 group-hover:opacity-30 transition duration-1000"></div>
+           <div className="relative">
+              <IndiaMap />
+           </div>
+        </motion.div>
+
         {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="bg-card rounded-xl border border-border p-5 shadow-card">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="bg-white/80 backdrop-blur-xl rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-all">
             <h3 className="text-sm font-display font-semibold text-card-foreground mb-4 flex items-center gap-2">
               <Activity className="w-4 h-4 text-primary" />
               Grievance Trends (6 Months)
