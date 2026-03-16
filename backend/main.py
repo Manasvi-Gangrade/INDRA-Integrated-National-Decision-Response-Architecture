@@ -1,24 +1,32 @@
 import os
+import tempfile
+import json
+import httpx
+import feedparser
+import asyncio
+
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import google.generativeai as genai
 from dotenv import load_dotenv
 import fitz  # PyMuPDF
-import tempfile
-import json
-import httpx
-from typing import List
+from typing import List, Optional
 
 # Load environment variables
 load_dotenv()
 
 # Configure Gemini API
 API_KEY = os.getenv("GEMINI_API_KEY")
+BLAND_AI_KEY = os.getenv("BLAND_AI_API_KEY")
+
 if API_KEY:
     genai.configure(api_key=API_KEY)
 else:
-    print("WARNING: GEMINI_API_KEY is not set in the environment variables.")
+    print("WARNING: GEMINI_API_KEY is not set.")
+
+if not BLAND_AI_KEY:
+    print("WARNING: BLAND_AI_API_KEY is not set. Outbound calls will fail.")
 
 # Initialize Model
 model = genai.GenerativeModel('gemini-2.5-flash')
@@ -44,6 +52,10 @@ class SentimentRequest(BaseModel):
 class ChatRequest(BaseModel):
     message: str
     history: List[dict] = []
+
+class CallRequest(BaseModel):
+    phone_number: str
+    task_prompt: str = ""
 
 @app.get("/")
 def read_root():
@@ -251,3 +263,205 @@ async def chat_with_indra(request: ChatRequest):
     except Exception as e:
         print("Chat Error:", str(e))
         raise HTTPException(status_code=500, detail="Failed to generate AI response.")
+
+@app.post("/api/voice/trigger-call")
+async def trigger_call(request: CallRequest):
+    if not BLAND_AI_KEY:
+        raise HTTPException(status_code=500, detail="Bland AI API Key is missing. Please configure backend/.env")
+    
+    # Cleaning phone number
+    phone = request.phone_number.strip()
+    if not phone.startswith('+'):
+        # Assuming Indian number if no code
+        if len(phone) == 10:
+            phone = f"+91{phone}"
+        else:
+            raise HTTPException(status_code=400, detail="Invalid phone number format. Use +[country_code][number]")
+
+    default_prompt = """
+    You are an automated emergency response official from INDRA (Integrated National Decision & Response Architecture).
+    You are calling to provide a critical update regarding a local situation.
+    Be professional, concise, and helpful.
+    """
+    
+    prompt = request.task_prompt if request.task_prompt else default_prompt
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(
+                "https://api.bland.ai/v1/calls",
+                headers={
+                    "authorization": BLAND_AI_KEY,
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "phone_number": phone,
+                    "task": prompt,
+                    "model": "enhanced",
+                    "voice": "nat",
+                    "language": "en-IN", # You can change this to 'hi' for Hindi
+                    "request_data": {
+                        "name": "Citizen",
+                        "context": "Emergency Outreach"
+                    }
+                },
+                timeout=30.0
+            )
+            
+            if response.status_code == 200:
+                return response.json()
+            else:
+                print(f"Bland AI Error: {response.text}")
+                raise HTTPException(status_code=response.status_code, detail=f"Bland AI failed: {response.text}")
+        except Exception as e:
+            print(f"Call Trigger Exception: {str(e)}")
+            raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/voice/call-details/{call_id}")
+async def get_call_details(call_id: str):
+    if not BLAND_AI_KEY:
+        raise HTTPException(status_code=500, detail="Bland AI API Key is missing.")
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(
+                f"https://api.bland.ai/v1/calls/{call_id}",
+                headers={"authorization": BLAND_AI_KEY}
+            )
+            if response.status_code == 200:
+                return response.json()
+            else:
+                raise HTTPException(status_code=response.status_code, detail=response.text)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+class WhatsAppRequest(BaseModel):
+    locations: List[str]
+    crisis_type: str
+    severity: str
+    action_required: str
+
+@app.post("/api/voice/send-whatsapp")
+async def send_whatsapp_broadcast(request: WhatsAppRequest):
+    if not API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API Key not configured. Cannot generate localized alerts.")
+
+    # 1. Generate the official Multi-lingual WhatsApp broadcast message using Gemini
+    prompt = f"""
+    You are the INDRA National Crisis Communication AI.
+    Generate an official SMS/WhatsApp emergency broadcast alert.
+    Crisis: {request.crisis_type}
+    Severity: {request.severity.upper()}
+    Locations Affected: {', '.join(request.locations)}
+    Citizen Action Required: {request.action_required}
+    
+    Format the message exactly as it should appear on a citizen's phone. Use emojis for visibility (🚨⚠️).
+    Include both English and Hindi text. Keep it extremely concise, urgent, and authoritative (like an NDRF/NDMA alert).
+    Do NOT include markdown backticks or extra conversational text.
+    """
+    
+    try:
+        response = model.generate_content(prompt)
+        broadcast_message = response.text.strip()
+    except Exception as e:
+        print(f"Failed to generate bilingual alert: {e}")
+        broadcast_message = f"🚨 INDRA EMERGENCY ALERT: {request.severity.upper()} {request.crisis_type} in {request.locations[0]}. Action: {request.action_required}. Stay safe."
+
+    # 2. Simulate Twilio API Dispatch (or hook up real Twilio if TWILIO_ACCOUNT_SID is set)
+    # Since this is for the Bharat Mandapam demonstration, we simulate the massive throughput.
+    simulated_target_count = len(request.locations) * 250000  # Estimate 250k people per location
+    
+    # Simulate API latency
+    await asyncio.sleep(1.5)
+
+    return {
+        "status": "success",
+        "message": "Broadcast dispatch initiated successfully.",
+        "payload": {
+            "dispatch_id": f"INDRA-BRD-{os.urandom(4).hex().upper()}",
+            "generated_content": broadcast_message,
+            "estimated_recipients": simulated_target_count,
+            "channels": ["WhatsApp Business API", "SMS Priority Route"],
+            "delivery_status": "Queued via NIC Hub"
+        }
+    }
+
+class OracleRequest(BaseModel):
+    crisis_type: str
+    location: Optional[str] = "India"
+
+@app.post("/api/oracle/predict")
+async def predict_ripple_effects(request: OracleRequest):
+    if not API_KEY:
+        raise HTTPException(status_code=500, detail="Gemini API Key not configured.")
+        
+    prompt = f"""
+    Act as 'The Oracle', INDRA's Predictive Ripple-Effect Engine.
+    Analyze the cascading impacts of a '{request.crisis_type}' in {request.location}.
+    Provide a multi-domain impact graph. 
+    Format your response as a JSON object with:
+    {{
+      "nodes": [
+        {{"id": "root", "label": "{request.crisis_type}", "color": "#ef4444", "size": 25}},
+        {{"id": "domain1", "label": "Impact Domain 1", "color": "#3b82f6", "size": 18}},
+        ...
+      ],
+      "links": [
+        {{"source": "root", "target": "domain1", "label": "direct impact"}},
+        ...
+      ],
+      "analysis": "A brief 2-sentence strategic summary of the overall risk."
+    }}
+    Domains to consider: Economy, Public Health, Infrastructure, Social Stability, Geopolitics.
+    Return ONLY raw JSON.
+    """
+    
+    try:
+        response = model.generate_content(prompt)
+        # Handle potential markdown formatting from Gemini
+        cleaned_json = response.text.strip('`').replace('json', '').strip()
+        return json.loads(cleaned_json)
+    except Exception as e:
+        print(f"Oracle Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate predictive model.")
+
+@app.get("/api/core/real-time-news")
+async def get_real_time_news():
+    # Google News RSS for India Governance
+    rss_url = "https://news.google.com/rss/search?q=India+Governance+Crisis+Weather&hl=en-IN&gl=IN&ceid=IN:en"
+    
+    try:
+        feed = feedparser.parse(rss_url)
+        news_items = []
+        
+        for entry in feed.entries[:5]: # Take top 5
+            news_items.append({
+                "title": entry.title,
+                "link": entry.link,
+                "published": entry.published,
+                "summary": entry.summary if 'summary' in entry else ""
+            })
+            
+        # Optional: Use Gemini to extract location/entities from these 5 titles
+        if API_KEY and news_items:
+            titles = [item["title"] for item in news_items]
+            prompt = f"""
+            Identify the primary city or state in India for each of these news titles. 
+            If no specific location, return 'India'.
+            Format as a JSON list of objects: [{{"location": "City/State", "type": "Weather/Crisis/Economy", "title": "Original Title"}}]
+            Titles: {json.dumps(titles)}
+            """
+            try:
+                # Running blocking genai in thread or async wrap
+                response = model.generate_content(prompt)
+                extracted = json.loads(response.text.strip('`').replace('json', '').strip())
+                for i, item in enumerate(news_items):
+                    if i < len(extracted):
+                        item["intel"] = extracted[i]
+            except Exception as e:
+                print(f"Extraction error: {e}")
+
+        return news_items
+    except Exception as e:
+        print(f"RSS Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch real-time news.")
