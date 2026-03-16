@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Shield, Bell, Menu, Cloud, MapPin, Volume2, VolumeX, Search, Clock } from "lucide-react";
+import { Shield, Menu, Cloud, MapPin, Volume2, VolumeX, Clock, Play } from "lucide-react";
 import { GoogleTranslateWidget, useTTS } from "./StandaloneTranslateTTS";
-import { motion } from "framer-motion";
 
 export function GlobalHeader({ onMenuToggle }: { onMenuToggle?: () => void }) {
   const { ttsEnabled, setTtsEnabled } = useTTS();
@@ -49,16 +48,14 @@ export function GlobalHeader({ onMenuToggle }: { onMenuToggle?: () => void }) {
           )}
           
           <Link to="/" className="flex items-center gap-3 group">
-            <div className={`w-11 h-11 rounded-xl indra-gradient-hero flex items-center justify-center shadow-lg group-hover:shadow-primary/50 transition-all duration-300 group-hover:scale-105`}>
-              <Shield className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-heading font-extrabold text-2xl tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 hidden sm:block">INDRA</span>
+            <span className="sr-only">Home</span>
           </Link>
           
           {/* Breadcrumb / Title for Dashboard */}
           {!isLanding && (
-            <div className="hidden lg:flex items-center ml-4 pl-4 border-l border-slate-300 text-slate-800">
-              <span className="text-base font-semibold tracking-tight">Command Interface</span>
+            <div className="hidden lg:flex flex-col ml-1">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">System</span>
+              <span className="text-sm font-extrabold text-slate-900 leading-none">Command Interface</span>
             </div>
           )}
         </div>
@@ -87,9 +84,6 @@ export function GlobalHeader({ onMenuToggle }: { onMenuToggle?: () => void }) {
 
         {/* Right Section: Tools & Auth */}
         <div className="flex items-center gap-3">
-          <button className="hidden sm:flex relative p-2.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors">
-            <Search className="w-5 h-5" />
-          </button>
           
           <button 
             onClick={() => setTtsEnabled(!ttsEnabled)}
@@ -99,16 +93,25 @@ export function GlobalHeader({ onMenuToggle }: { onMenuToggle?: () => void }) {
             {ttsEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
           </button>
           
-          <button className="relative p-2.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors mr-2">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-destructive rounded-full animate-pulse-dot" />
-          </button>
-
-          <div className="hidden sm:block border-r border-border h-6 mr-1" />
+          <div className="hidden sm:block border-r border-border h-6 mr-1 ml-1" />
 
           {/* Translate Widget Wrapper */}
           <div className="relative group flex items-center h-8 ml-1">
             <GoogleTranslateWidget />
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-4 ml-2 sm:ml-4">
+            <Link to="/simulation" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs sm:text-sm font-extrabold rounded-lg sm:rounded-xl shadow-sm transition-all hover:-translate-y-0.5 whitespace-nowrap">
+              <Play className="w-4 h-4 text-blue-600" /> SIMULATION
+            </Link>
+            <Link to="/register" className="px-3 sm:px-6 py-2 sm:py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-sm font-extrabold rounded-lg sm:rounded-xl shadow-md sm:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all hover:-translate-y-0.5 whitespace-nowrap">
+              <span className="sm:hidden">REG</span>
+              <span className="hidden sm:inline">REGISTRATION</span>
+            </Link>
+            <Link to="/login" className="px-3 sm:px-6 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-[10px] sm:text-sm font-extrabold rounded-lg sm:rounded-xl shadow-md sm:shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all hover:-translate-y-0.5 whitespace-nowrap">
+              <span className="sm:hidden">LOGIN</span>
+              <span className="hidden sm:inline">LOGIN</span>
+            </Link>
           </div>
 
         </div>

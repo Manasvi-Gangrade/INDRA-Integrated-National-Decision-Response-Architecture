@@ -10,7 +10,7 @@ interface Message {
 
 export default function MainChatbot() {
     const [messages, setMessages] = useState<Message[]>([
-        { id: '1', type: 'bot', text: 'Namaste! I am INDRA, the Global Ontology Engine AI. Ask me anything about real-time cross-domain intelligence (Climate, Defense, Geopolitics, Economy) and our simulated live feeds.' }
+        { id: '1', type: 'bot', text: 'Namaste! I am INDRA, the Global Ontology Engine AI. Ask me anything about real-time cross-domain intelligence (Climate, Defense, Geopolitics, Economy) or how to use the platform.' }
     ]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -33,7 +33,6 @@ export default function MainChatbot() {
         setIsTyping(true);
 
         try {
-            // using relative path if proxied, or localhost. If frontend runs on 5173, backend is on 8000
             const res = await fetch("http://127.0.0.1:8000/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -61,10 +60,6 @@ export default function MainChatbot() {
             
             <div className="max-w-6xl mx-auto px-6 relative">
                 <div className="text-center max-w-3xl mx-auto mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-600 text-xs font-bold mb-6 uppercase tracking-widest backdrop-blur-md shadow-sm">
-                        <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                        AI Query Interface
-                    </div>
                     <h2 className="font-heading text-4xl sm:text-5xl md:text-7xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-cyan-600 to-blue-700 tracking-tight drop-shadow-sm">INDRABOT</h2>
                     <p className="text-slate-600 font-semibold text-base sm:text-lg md:text-xl max-w-2xl mx-auto italic">"The Infinite Mind of India's Governance"</p>
                     <p className="text-slate-500 mt-4 text-sm sm:text-base">Query the Global Ontology Engine directly. Ask about live scenarios, data correlations, or the system architecture.</p>
@@ -88,7 +83,7 @@ export default function MainChatbot() {
                     </div>
 
                     {/* Messages Area */}
-                    <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-slate-50/50">
+                    <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6 bg-slate-50/50 relative">
                         {messages.map((msg) => (
                             <div
                                 key={msg.id}

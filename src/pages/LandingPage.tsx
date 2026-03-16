@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import { Shield, Brain, Phone, Users, BarChart3, Globe, TrendingUp, Zap, ArrowRight, Play, Database } from "lucide-react";
+import { Shield, Brain, Phone, Users, BarChart3, TrendingUp, Zap, ArrowRight, Play, Database } from "lucide-react";
 import { motion } from "framer-motion";
 import IndraBot from "@/components/IndraBot";
 import MainChatbot from "@/components/MainChatbot";
 import LiveTicker from "@/components/LiveTicker";
+import NewsScrollingPanel from "@/components/NewsScrollingPanel";
 import mapBg from "@/assets/india-map-bg.png";
 import teamBanner from "@/assets/team-banner.png";
 import gallery1 from "@/assets/images/gallery1.jpeg";
@@ -58,72 +59,80 @@ const LandingPage = () => {
             A unified AI platform converting massive governance data into actionable intelligence, empowering leaders with real-time insights and unparalleled citizen connection at scale.
             </motion.p>
 
-            <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
-            >
-            <Link to="/command-center" className="w-full sm:w-auto relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 rounded-xl blur opacity-30 group-hover:opacity-60 transition duration-500 group-hover:duration-200" />
-                <button className="relative w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 text-white hover:bg-blue-700 rounded-xl font-bold text-base transition-all transform hover:-translate-y-1">
-                Access Command Center
-                <Zap className="w-5 h-5 text-blue-200" />
-                </button>
-            </Link>
-
-            <Link to="/simulation" className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-white/50 backdrop-blur-sm border-2 border-slate-200 hover:border-blue-500/50 text-slate-800 rounded-xl font-semibold transition-all hover:bg-white/80 transform hover:-translate-y-1">
-                <Play className="w-5 h-5 text-blue-600" />
-                Run Simulation
-            </Link>
-            </motion.div>
+            {/* Shifted Image Gallery - Responsive Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-2xl mt-4 lg:mt-0">
+                 <img src={gallery1} className="w-full aspect-video rounded-xl object-cover border-2 border-white shadow-md hover:scale-105 transition-transform cursor-pointer bg-slate-200" alt="Gallery 1" />
+                 <img src={gallery2} className="w-full aspect-video rounded-xl object-cover border-2 border-white shadow-md hover:scale-105 transition-transform cursor-pointer bg-slate-200" alt="Gallery 2" />
+                 <img src={gallery3} className="w-full aspect-video rounded-xl object-cover border-2 border-white shadow-md hover:scale-105 transition-transform cursor-pointer bg-slate-200" alt="Gallery 3" />
+                 <img src={gallery4} className="w-full aspect-video rounded-xl object-cover border-2 border-white shadow-md hover:scale-105 transition-transform cursor-pointer bg-slate-200" alt="Gallery 4" />
+            </div>
         </div>
 
-        {/* Dynamic Image Gallery */}
-        <div className="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 relative z-20 mt-12 lg:mt-0">
-            <motion.div whileHover={{ scale: 1.03, y: -5, zIndex: 30 }} transition={{ type: "spring", stiffness: 300 }} className="overflow-hidden rounded-2xl shadow-xl border-4 border-white/80 aspect-[11/6] z-10 relative group">
-                <div className="absolute inset-0 bg-blue-900/10 group-hover:bg-transparent transition-colors duration-300"></div>
-                <img src={gallery1} alt="INDRA Platform Display 1" className="w-full h-full object-cover" />
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.03, y: -5, zIndex: 30 }} transition={{ type: "spring", stiffness: 300 }} className="overflow-hidden rounded-2xl shadow-xl border-4 border-white/80 aspect-[11/6] sm:mt-12 z-10 relative group">
-                <div className="absolute inset-0 bg-cyan-900/10 group-hover:bg-transparent transition-colors duration-300"></div>
-                <img src={gallery2} alt="INDRA Platform Display 2" className="w-full h-full object-cover" />
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.03, y: -5, zIndex: 30 }} transition={{ type: "spring", stiffness: 300 }} className="overflow-hidden rounded-2xl shadow-xl border-4 border-white/80 aspect-[11/6] sm:-mt-8 z-10 relative group">
-                <div className="absolute inset-0 bg-indigo-900/10 group-hover:bg-transparent transition-colors duration-300"></div>
-                <img src={gallery3} alt="INDRA Platform Display 3" className="w-full h-full object-cover" />
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.03, y: -5, zIndex: 30 }} transition={{ type: "spring", stiffness: 300 }} className="overflow-hidden rounded-2xl shadow-xl border-4 border-white/80 aspect-[11/6] sm:mt-4 z-10 relative group">
-                <div className="absolute inset-0 bg-slate-900/10 group-hover:bg-transparent transition-colors duration-300"></div>
-                <img src={gallery4} alt="INDRA Platform Display 4" className="w-full h-full object-cover" />
-            </motion.div>
+        {/* Dynamic Video Gallery (Right Side) */}
+        <div className="w-full lg:w-1/2 flex flex-col gap-4 relative z-20 mt-12 lg:mt-0 lg:pl-8">
+             <div className="flex items-center justify-between mb-2">
+                 <h2 className="text-xl font-heading font-extrabold text-slate-800 flex items-center gap-2"><Play className="w-5 h-5 text-red-600 fill-red-600" /> Live Threat & News Feeds</h2>
+                 <span className="px-3 py-1 bg-red-100 text-red-600 text-xs font-extrabold tracking-widest uppercase rounded-full animate-pulse border border-red-200 shadow-sm">Live Feed</span>
+             </div>
+             
+             {/* Main Video (ABP News Live) */}
+             <div className="w-full aspect-video bg-slate-900 rounded-3xl overflow-hidden border-[6px] border-slate-800 relative shadow-[0_0_40px_rgba(0,0,0,0.2)] group">
+                  <iframe 
+                     className="w-full h-full scale-[1.05]"
+                     src="https://www.youtube.com/embed/OmozwQIpgu8?autoplay=1&mute=1&playlist=OmozwQIpgu8&loop=1&enablejsapi=1" 
+                     title="ABP News Live"
+                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                     allowFullScreen
+                  ></iframe>
+                  <div className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded shadow-md uppercase tracking-widest flex items-center gap-1">
+                      <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                      ABP NEWS LIVE
+                  </div>
+                 <div className="absolute inset-0 border-2 border-red-500/0 group-hover:border-red-500/50 transition-colors pointer-events-none rounded-[20px] z-10" />
+             </div>
+             
+             {/* Thumbnail Videos (Aaj Tak & NDTV) - Stack on Mobile */}
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                 <div className="w-full aspect-video bg-slate-900 rounded-2xl overflow-hidden border-4 border-slate-800 relative shadow-lg group">
+                      <iframe 
+                         className="w-full h-full scale-[1.05]"
+                         src="https://www.youtube.com/embed/Nq2wYlWFucg?autoplay=1&mute=1&playlist=Nq2wYlWFucg&loop=1&enablejsapi=1" 
+                         title="Aaj Tak Live"
+                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      ></iframe>
+                      <div className="absolute inset-0 border-2 border-blue-500/0 group-hover:border-blue-500/50 transition-colors pointer-events-none rounded-xl z-10" />
+                      <div className="absolute top-3 left-3 bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow-md uppercase tracking-wider flex items-center gap-1">
+                          <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
+                          AAJ TAK
+                      </div>
+                 </div>
+                 <div className="w-full aspect-video bg-slate-900 rounded-2xl overflow-hidden border-4 border-slate-800 relative shadow-lg group">
+                      <iframe 
+                         className="w-full h-full scale-[1.05]"
+                         src="https://www.youtube.com/embed/7LQk4OYxrOI?autoplay=1&mute=1&playlist=7LQk4OYxrOI&loop=1&enablejsapi=1" 
+                         title="NDTV Live"
+                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      ></iframe>
+                      <div className="absolute inset-0 border-2 border-blue-500/0 group-hover:border-blue-500/50 transition-colors pointer-events-none rounded-xl z-10" />
+                      <div className="absolute top-3 left-3 bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow-md uppercase tracking-wider flex items-center gap-1">
+                          <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
+                          NDTV INDIA
+                      </div>
+                 </div>
+             </div>
         </div>
+      </div>
 
-        {/* Floating Abstract UI elements to make it look "techy" */}
-        <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute hidden xl:flex top-1/4 right-[5%] p-4 rounded-2xl bg-white/60 backdrop-blur-md border border-slate-200 shadow-xl items-center gap-4"
-        >
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center"><Brain className="w-5 h-5 text-blue-600" /></div>
-          <div className="text-left"><p className="text-xs text-slate-500 uppercase font-semibold">Ontology Engine</p><p className="font-bold text-slate-800 text-sm">Synchronized</p></div>
-        </motion.div>
-
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute hidden xl:flex bottom-1/4 right-[10%] p-4 rounded-2xl bg-white/60 backdrop-blur-md border border-slate-200 shadow-xl items-center gap-4"
-        >
-          <div className="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center"><Phone className="w-5 h-5 text-cyan-600" /></div>
-          <div className="text-left"><p className="text-xs text-slate-500 uppercase font-semibold">Live Calls</p><p className="font-bold text-slate-800 text-sm">1.2M / sec</p></div>
-        </motion.div>
+      {/* Real-time News Scrolling Panel - Moved Up */}
+      <div className="-mt-12 mb-12">
+        <NewsScrollingPanel />
       </div>
 
       {/* Main Chatbot Interface */}
       <MainChatbot />
 
-      {/* Modules Section */}
-      <section className="relative z-10 bg-card/50 backdrop-blur-3xl border-y border-border/50">
+      {/* Mainland Content (Modules) */}
+      <section className="relative z-10 bg-card/50 backdrop-blur-3xl border-b border-border/50">
         <div className="max-w-7xl mx-auto px-6 py-24">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 drop-shadow-sm">Three Integrated AI Cores</h2>
@@ -132,9 +141,9 @@ const LandingPage = () => {
 
           <div className="grid md:grid-cols-3 gap-10">
             {[
-              { icon: Brain, title: "INDRA CORE", subtitle: "Global Ontology Engine", desc: "Connects government data into a living knowledge graph. Detects patterns, correlations, and emerging risks across domains.", features: ["Real-time Data Fusion", "Predictive Risk Analytics", "Live Geopolitical Sync"], color: "text-blue-600", bg: "bg-blue-600/10", border: "hover:border-blue-500/50", glow: "hover:shadow-[0_0_30px_rgba(37,99,235,0.2)]", link: "/command-center" },
-              { icon: Phone, title: "INDRA VOICE", subtitle: "AI Citizen Call System", desc: "AI-powered voice system that makes and receives millions of citizen calls simultaneously in all 22+ local Indian languages.", features: ["Multilingual Outbound", "Live Sentiment Analysis", "Grievance Routing"], color: "text-cyan-600", bg: "bg-cyan-600/10", border: "hover:border-cyan-500/50", glow: "hover:shadow-[0_0_30px_rgba(6,182,212,0.2)]", link: "/voice/calls" },
-              { icon: Users, title: "INDRA PILOT", subtitle: "Leader Co-Pilot", desc: "AI assistant for District Magistrates and Ministers. Generates briefings, speeches, and hyper-local constituency intelligence.", features: ["Auto Speech Drafting", "Meeting Intelligence", "Document Summarizer"], color: "text-purple-600", bg: "bg-purple-600/10", border: "hover:border-purple-500/50", glow: "hover:shadow-[0_0_30px_rgba(147,51,234,0.2)]", link: "/pilot/copilot" },
+              { icon: Brain, title: "INDRA CORE", subtitle: "Global Ontology Engine", desc: "A continuously evolving AI backbone that connects all structured and unstructured governance data into a live semantic knowledge graph. Ingests data from 500+ live sources including IMD, RBI, and social media signals.", features: ["Real-time Relationship Mapping", "Cross-Domain Correlation", "Anomaly & Threshold Alerts"], color: "text-blue-600", bg: "bg-blue-600/10", border: "hover:border-blue-500/50", glow: "hover:shadow-[0_0_30px_rgba(37,99,235,0.2)]", link: "/command-center" },
+              { icon: Phone, title: "INDRA VOICE", subtitle: "Multilingual AI Calling Agent", desc: "A high-volume, context-aware calling agent handling natural conversations in all 22 scheduled Indian languages. Purpose-built for grievance workflows, scheme eligibility, and out-bound outreach at national scale.", features: ["90% Faster Resolution", "IndicTrans2 Multilingual NLP", "Sentiment-Driven Escalation"], color: "text-cyan-600", bg: "bg-cyan-600/10", border: "hover:border-cyan-500/50", glow: "hover:shadow-[0_0_30px_rgba(6,182,212,0.2)]", link: "/voice/calls" },
+              { icon: Users, title: "INDRA PILOT", subtitle: "Admin Co-Pilot", desc: "A secure intelligence assistant designed for District Magistrates and Ministers. Drastically reduces cognitive load by summarizing 200+ files daily and drafting official communications in seconds.", features: ["Intelligent Summarizer", "Meeting Intelligence", "Constituency Heatmaps"], color: "text-purple-600", bg: "bg-purple-600/10", border: "hover:border-purple-500/50", glow: "hover:shadow-[0_0_30px_rgba(147,51,234,0.2)]", link: "/pilot/copilot" },
             ].map((mod, i) => (
               <motion.div
                 key={mod.title}
@@ -174,45 +183,60 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Data Partners Section */}
-      <section className="relative z-10 bg-card/30 backdrop-blur-md border-b border-border/50 py-20 pb-28">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-sm text-muted-foreground font-bold uppercase tracking-widest mb-12">Integrated Data Ecosystems</p>
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-            {[
-               { name: "OPEN-METEO", style: "bg-blue-50 border-blue-200 text-blue-600" },
-               { name: "USGS", style: "bg-cyan-50 border-cyan-200 text-cyan-600" },
-               { name: "CPGRAMS", style: "bg-purple-50 border-purple-200 text-purple-600" },
-               { name: "RBI", style: "bg-teal-50 border-teal-200 text-teal-600" },
-               { name: "IMD AWS", style: "bg-indigo-50 border-indigo-200 text-indigo-600" },
-               { name: "BHUVAN ISRO", style: "bg-emerald-50 border-emerald-200 text-emerald-600" },
-               { name: "UIDAI", style: "bg-orange-50 border-orange-200 text-orange-600" },
-               { name: "GSTN", style: "bg-rose-50 border-rose-200 text-rose-600" },
-               { name: "NDMA", style: "bg-red-50 border-red-200 text-red-600" }
-            ].map((source, idx) => (
-                <motion.div 
-                   key={source.name}
-                   animate={{ y: [0, -8, 0] }} transition={{ duration: 3 + (idx % 3), repeat: Infinity, ease: "easeInOut", delay: idx * 0.2 }}
-                   className={`border px-6 py-3 rounded-2xl shadow-sm hover:shadow-md transition-shadow ${source.style.split(' ').slice(0, 2).join(' ')}`}
-                >
-                  <span className={`font-heading font-extrabold text-lg tracking-widest ${source.style.split(' ')[2]}`}>{source.name}</span>
-                </motion.div>
-            ))}
+ 
+      {/* Project Deep-Dive / Detailed Documentation Section */}
+      <section className="relative z-10 bg-slate-50 py-32 overflow-hidden">
+        <div className="max-w-5xl mx-auto px-6 relative">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 items-start">
+            <div className="sticky top-12">
+               <h3 className="font-heading text-2xl font-black uppercase tracking-tighter mb-4">Architecture <br/><span className="text-blue-600">Specification</span></h3>
+               <div className="w-12 h-1 bg-blue-600 mb-8" />
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-loose">
+                 v4.0.2 / National Governance OS <br/>
+                 Digital Democracy Track <br/>
+                 India Innovates 2026
+               </p>
+            </div>
+            <div className="md:col-span-3 space-y-16">
+               <div className="space-y-6">
+                 <h4 className="text-xl font-black text-slate-900 flex items-center gap-4">
+                   <span className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs">01</span>
+                   INDRA CORE: The Global Ontology Engine
+                 </h4>
+                 <p className="text-slate-600 leading-relaxed font-medium">
+                   At the heart of the architecture lies the **Global Ontology Engine**. Unlike traditional databases, CORE uses a proprietary semantic mapping layer to unify structured data (Meteorological, Seismic, Economic) with unstructured intelligence (Satellite imagery, Social sentiment, Live news). This allows for "Flash Intelligence" — where a flood in Assam is instantly correlated with vegetable prices in Delhi within milliseconds.
+                 </p>
+               </div>
+               <div className="space-y-6">
+                 <h4 className="text-xl font-black text-slate-900 flex items-center gap-4">
+                   <span className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs">02</span>
+                   INDRA VOICE: Multilingual Sovereign Interaction
+                 </h4>
+                 <p className="text-slate-600 leading-relaxed font-medium">
+                   VOICE is not just an IVR; it's a **State-Scale AI Calling Agent**. Built to bypass the "digital divide," it communicates directly with citizens in over 22 Indian languages via standard GSM voice calls. It automatically processes grievances, executes massive biometric-verified outbound campaigns, and generates live sentiment heatmaps for Chief Ministers and District Magistrates.
+                 </p>
+               </div>
+               <div className="space-y-6">
+                 <h4 className="text-xl font-black text-slate-900 flex items-center gap-4">
+                   <span className="w-8 h-8 rounded-lg bg-purple-600 text-white flex items-center justify-center text-xs">03</span>
+                   INDRA PILOT: Leader Decision Co-Pilot
+                 </h4>
+                 <p className="text-slate-600 leading-relaxed font-medium">
+                   Designed for administrative excellence, PILOT serves as an **AI Executive Assistant**. It ingests 1000-page policy documents in seconds, providing instant summaries, risk identification, and actionable recommendations. It even assists in communication by generating professional, evidence-backed speeches and directives in real-time during crisis scenarios.
+                 </p>
+               </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 bg-background py-16">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center text-center gap-4">
-          <div className="w-full max-w-4xl mx-auto mb-8 flex flex-col items-center">
-             <h3 className="font-heading font-extrabold text-2xl tracking-widest text-foreground mb-6 uppercase">Our Team</h3>
-             <img src={teamBanner} alt="Team Vision Buddies" className="w-full h-auto rounded-2xl shadow-xl border border-border/50" />
-          </div>
-          
-          <p className="text-sm text-muted-foreground font-medium tracking-wide">
-            © 2026 INDRA — Integrated National Decision & Response Architecture.
-          </p>
+      {/* Simplified Footer - Ultra Clean Version */}
+      <footer className="relative z-10 bg-slate-50 py-12 text-slate-500 overflow-hidden border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-4 text-center">
+             <div className="w-16 h-px bg-slate-200 mb-2" />
+             <p className="text-[10px] font-bold uppercase tracking-[0.3em]">
+               © 2026 INDRA — India Innovates Digital Democracy
+             </p>
         </div>
       </footer>
 

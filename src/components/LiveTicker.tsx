@@ -24,7 +24,7 @@ export default function LiveTicker() {
             <div className="flex-1 relative overflow-hidden h-5">
                 <motion.div
                     animate={{ x: ["0%", "-100%"] }}
-                    transition={{ ease: "linear", duration: 30, repeat: Infinity }}
+                    transition={{ ease: "linear", duration: 80, repeat: Infinity }}
                     className="whitespace-nowrap flex gap-16 absolute top-0 text-sm font-medium tracking-wide"
                 >
                     {/* Double the array for seamless looping */}

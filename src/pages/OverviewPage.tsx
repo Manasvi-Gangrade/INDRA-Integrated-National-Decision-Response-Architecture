@@ -1,4 +1,4 @@
-import { Brain, Phone, Users, Zap, Database, Satellite, Globe, Shield } from "lucide-react";
+import { Brain, Phone, Users, Zap, Database, Satellite, Globe } from "lucide-react";
 
 const OverviewPage = () => {
   const modules = [
@@ -12,7 +12,7 @@ const OverviewPage = () => {
     { icon: Satellite, name: "ISRO Satellite Data", status: "Active" },
     { icon: Database, name: "PM-KISAN Database", status: "Active" },
     { icon: Globe, name: "IMD Weather API", status: "Active" },
-    { icon: Shield, name: "NCRB Crime Data", status: "Active" },
+    { icon: Database, name: "NCRB Crime Data", status: "Active" },
     { icon: Database, name: "Census 2021", status: "Active" },
     { icon: Globe, name: "Social Media Feeds", status: "Active" },
   ];

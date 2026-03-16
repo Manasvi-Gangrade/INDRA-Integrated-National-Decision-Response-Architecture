@@ -5,7 +5,77 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function OutboundCampaigns() {
   const [runningCampaign, setRunningCampaign] = useState(false);
   const [liveLogs, setLiveLogs] = useState<string[]>([]);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [calling, setCalling] = useState(false);
+  const [callId, setCallId] = useState<string | null>(null);
+  const [transcript, setTranscript] = useState<string[]>([]);
+  const [callStatus, setCallStatus] = useState<string>("standby");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const transcriptRef = useRef<HTMLDivElement>(null);
+
+  const handleLaunchCampaign = async () => {
+    if (!phoneNumber.trim()) {
+      setRunningCampaign(true);
+      return;
+    }
+
+    setCalling(true);
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/voice/trigger-call", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          phone_number: phoneNumber,
+          task_prompt: "You are an emergency official from INDRA. Call the citizen specifically to inform them about a PM-KISAN enrollment gap in their area (Bihar, India). Speak professionally in English with a slight Indian accent if possible."
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setCallId(data.call_id);
+        setCallStatus("initiated");
+        setLiveLogs(prev => [...prev, `[SYSTEM] Real-time link established with ${phoneNumber}`, `[SYSTEM] Call ID: ${data.call_id}`]);
+        setRunningCampaign(true);
+      } else {
+        const err = await res.json();
+        alert("Failed to trigger real call: " + (err.detail || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Call trigger error:", error);
+      alert("System Outline: Could not connect to backend to trigger real call.");
+    } finally {
+      setCalling(false);
+    }
+  };
+
+  // Poll for transcript if call is active
+  useEffect(() => {
+    let pollInterval: NodeJS.Timeout;
+    
+    if (callId && runningCampaign) {
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`http://127.0.0.1:8000/api/voice/call-details/${callId}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.transcript && data.transcript.length > 0) {
+              setTranscript(data.transcript.split('\n'));
+            }
+            setCallStatus(data.status);
+            
+            if (data.status === 'completed') {
+              setLiveLogs(prev => [...prev, `[SYSTEM] Call ${callId} completed successfully.`]);
+              setCallId(null);
+            }
+          }
+        } catch (error) {
+          console.error("Polling error:", error);
+        }
+      }, 3000);
+    }
+    
+    return () => clearInterval(pollInterval);
+  }, [callId, runningCampaign]);
 
   // Auto-generate logs when campaign is running
   useEffect(() => {
@@ -16,13 +86,11 @@ export default function OutboundCampaigns() {
       let count = 0;
       interval = setInterval(() => {
         const statuses = [
-          "Dialing +91-98765*****",
-          "Connected - Playing Audio (Maithili)",
-          "Citizen Confirmed Enrollment Interest",
-          "No Answer - Scheduled for Callback",
-          "Connected - Playing Audio (Bhojpuri)",
-          "Citizen Confirmed Enrollment Interest",
-          "Dialing +91-88492*****"
+          "Dialing +91-98210*****",
+          "Connected - Syncing Voice Model",
+          "Citizen Interactive - Answering Query",
+          "No Answer - Retrying later",
+          "Dialing +91-77492*****"
         ];
         
         const nextLog = `[${new Date().toLocaleTimeString()}] ${statuses[count % statuses.length]}`;
@@ -32,9 +100,10 @@ export default function OutboundCampaigns() {
         if (scrollRef.current) {
           scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-      }, 1500);
+      }, 3000);
     } else {
       setLiveLogs([]);
+      setTranscript([]);
     }
     return () => clearInterval(interval);
   }, [runningCampaign]);
@@ -82,39 +151,69 @@ export default function OutboundCampaigns() {
               </div>
            </div>
 
-           <div className="space-y-4 relative z-10 mt-8">
-              <h3 className="font-bold text-slate-800 flex items-center gap-2"><Terminal className="w-5 h-5 text-indigo-500" /> Live Dispatch Feed</h3>
-              
-              <div className="bg-[#0f172a] rounded-xl p-4 h-64 border border-slate-700 shadow-inner relative overflow-hidden group/term">
-                <div className="absolute top-0 right-0 p-2 text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1">
-                   <Activity className="w-3 h-3 text-emerald-400" /> Matrix Linked
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10 mt-8">
+              <div className="space-y-4">
+                <h3 className="font-bold text-slate-800 flex items-center gap-2"><Terminal className="w-5 h-5 text-indigo-500" /> Campaign Matrix</h3>
+                <div className="bg-[#0f172a] rounded-xl p-4 h-80 border border-slate-700 shadow-inner relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-2 text-[10px] font-bold text-slate-500 uppercase flex items-center gap-1">
+                    <Activity className="w-3 h-3 text-emerald-400" /> Real-time Node
+                  </div>
+                  
+                  <div ref={scrollRef} className="h-full overflow-y-auto font-mono text-[11px] space-y-1 pb-4 scroll-smooth custom-scrollbar text-slate-300">
+                    {!runningCampaign ? (
+                      <div className="flex h-full items-center justify-center text-slate-500 italic">Waiting...</div>
+                    ) : (
+                      <AnimatePresence>
+                        {liveLogs.map((log, i) => (
+                          <div key={i} className={`${log.includes("[SYSTEM]") ? "text-cyan-400 font-bold" : ""}`}>
+                            <span className="opacity-30 mr-2">›</span>{log}
+                          </div>
+                        ))}
+                      </AnimatePresence>
+                    )}
+                  </div>
                 </div>
-                
-                <div ref={scrollRef} className="h-full overflow-y-auto font-mono text-sm space-y-2 pb-4 scroll-smooth custom-scrollbar">
-                  {!runningCampaign ? (
-                    <div className="flex h-full items-center justify-center text-slate-500 italic text-sm">Waiting for campaign deployment...</div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-blue-500" /> 
+                  Live Call Transcript
+                  {callId && <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full animate-pulse">RECORDING</span>}
+                </h3>
+                <div className="bg-white rounded-xl p-4 h-80 border border-slate-200 shadow-inner flex flex-col">
+                  {!callId ? (
+                    <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-sm text-center px-6">
+                      <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-3">
+                        <Activity className="w-6 h-6 opacity-20" />
+                      </div>
+                      <p>Trigger a real call to see live speech-to-text transcription here.</p>
+                    </div>
                   ) : (
-                    <AnimatePresence>
-                      {liveLogs.map((log, i) => (
-                        <motion.div 
-                          key={i} 
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className={`
-                            ${log.includes("[SYSTEM]") ? "text-slate-400 font-bold" : ""}
-                            ${log.includes("Dialing") ? "text-cyan-400" : ""}
-                            ${log.includes("Connected") ? "text-amber-400" : ""}
-                            ${log.includes("Confirmed") ? "text-emerald-400 font-bold bg-emerald-900/20 px-2 py-0.5 rounded" : ""}
-                            ${log.includes("No Answer") ? "text-rose-400" : ""}
-                          `}
-                        >
-                          <span className="opacity-50 select-none mr-2">›</span>
-                          {log}
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
+                    <div ref={transcriptRef} className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+                      {transcript.length === 0 ? (
+                        <div className="text-slate-400 italic text-sm p-2 bg-slate-50 rounded-lg">Connecting audio bridge... Waiting for first utterance.</div>
+                      ) : (
+                        transcript.map((line, i) => (
+                          <motion.div 
+                            key={i} 
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={`text-sm p-3 rounded-xl ${line.toLowerCase().startsWith('user:') ? 'bg-blue-50 text-blue-800 self-end ml-8' : 'bg-slate-50 text-slate-800 mr-8'}`}
+                          >
+                            <span className="font-bold uppercase text-[9px] block mb-1 opacity-50">{line.split(':')[0]}</span>
+                            {line.split(':').slice(1).join(':')}
+                          </motion.div>
+                        ))
+                      )}
+                    </div>
                   )}
-                  {runningCampaign && <div className="w-2 h-4 bg-emerald-400 animate-pulse mt-2 inline-block"></div>}
+                  {callStatus !== 'standby' && (
+                    <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase">Status: <span className="text-blue-600">{callStatus}</span></span>
+                      <span className="text-[10px] font-mono text-slate-400">ID: {callId?.slice(0, 8)}...</span>
+                    </div>
+                  )}
                 </div>
               </div>
            </div>
@@ -136,8 +235,15 @@ export default function OutboundCampaigns() {
                    </select>
                 </div>
                 <div>
-                   <label className="text-xs font-bold text-slate-400 uppercase">Target Audience (CORE Query)</label>
-                   <input type="text" value="Farmers > Bihar > Not in PM-KISAN" readOnly className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 mt-1 text-sm text-white focus:outline-none" />
+                   <label className="text-xs font-bold text-slate-400 uppercase">Target Phone (For Real Test)</label>
+                   <input 
+                    type="text" 
+                    placeholder="+91-XXXXXXXXXX" 
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 mt-1 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 placeholder:text-slate-500" 
+                   />
+                   <p className="text-[10px] text-slate-500 mt-1 italic">Optional: Leave empty for simulation logs only.</p>
                 </div>
                 <div>
                    <label className="text-xs font-bold text-slate-400 uppercase">Languages (Auto-detect)</label>
@@ -149,10 +255,11 @@ export default function OutboundCampaigns() {
                 </div>
                 
                 <button 
-                  onClick={() => setRunningCampaign(true)}
-                  className={`w-full mt-4 py-3 rounded-xl font-bold text-sm transition-all shadow-md ${runningCampaign ? 'bg-cyan-900 text-cyan-400' : 'bg-cyan-500 hover:bg-cyan-600 text-white'}`}
+                  onClick={handleLaunchCampaign}
+                  disabled={calling}
+                  className={`w-full mt-4 py-3 rounded-xl font-bold text-sm transition-all shadow-md ${runningCampaign ? 'bg-cyan-900 text-cyan-400' : 'bg-cyan-500 hover:bg-cyan-600 text-white'} ${calling ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  {runningCampaign ? 'Campaign Initializing...' : 'Generate & Deploy'}
+                  {calling ? 'Triggering Real Call...' : runningCampaign ? 'Campaign Initializing...' : 'Generate & Deploy'}
                 </button>
              </div>
           </div>

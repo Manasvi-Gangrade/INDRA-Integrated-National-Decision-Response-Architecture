@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
+import RegistrationPage from "./pages/RegistrationPage";
 import OverviewPage from "./pages/OverviewPage";
 import DashboardPage from "./pages/DashboardPage";
 import IntelligenceEngine from "./pages/indra-core/IntelligenceEngine";
@@ -50,13 +51,10 @@ const App = () => (
               <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegistrationPage />} />
 
               {/* Protected Routes */}
-              <Route element={
-                <ProtectedRoute>
-                  <DashboardLayout />
-                </ProtectedRoute>
-              }>
+              <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
                 <Route path="/overview" element={<OverviewPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/core/intelligence" element={<IntelligenceEngine />} />

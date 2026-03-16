@@ -1,6 +1,7 @@
 import { grievanceData, monthlyTrendData } from '@/data/mockData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { motion } from 'framer-motion';
+import { CheckCircle2, Link as LinkIcon } from 'lucide-react';
 
 const COLORS = [
   'hsl(220, 70%, 45%)', 'hsl(25, 95%, 53%)', 'hsl(145, 60%, 40%)', 'hsl(260, 50%, 55%)',
@@ -84,13 +85,28 @@ export default function GrievancesPage() {
               </thead>
               <tbody>
                 {grievanceData.map((g) => (
-                  <tr key={g.category} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
-                    <td className="p-4 font-medium text-card-foreground">{g.category}</td>
+                  <tr key={g.category} className="border-b border-border/50 hover:bg-muted/30 transition-colors group">
+                    <td className="p-4">
+                      <div className="flex flex-col">
+                        <span className="font-medium text-card-foreground">{g.category}</span>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                          <span className="text-[10px] font-mono text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                            TX: 0x{Math.random().toString(16).slice(2, 10)}...
+                          </span>
+                        </div>
+                      </div>
+                    </td>
                     <td className="p-4 text-right text-muted-foreground">{g.count.toLocaleString()}</td>
                     <td className="p-4 text-right text-indra-green font-medium">{g.resolved.toLocaleString()}</td>
                     <td className="p-4 text-right text-indra-amber font-medium">{g.pending.toLocaleString()}</td>
                     <td className="p-4 text-right text-muted-foreground">{g.avgResolutionDays}d</td>
-                    <td className="p-4 text-right font-medium text-card-foreground">{Math.round((g.resolved / g.count) * 100)}%</td>
+                    <td className="p-4 text-right font-medium text-card-foreground">
+                      <div className="flex items-center justify-end gap-2">
+                        {Math.round((g.resolved / g.count) * 100)}%
+                        <LinkIcon className="w-3 h-3 text-slate-300 hover:text-primary cursor-pointer" />
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

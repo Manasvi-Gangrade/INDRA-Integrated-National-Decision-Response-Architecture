@@ -11,7 +11,7 @@ interface Message {
 export default function IndraBot() {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
-        { id: '1', type: 'bot', text: 'Namaste! I am the System Help Chatbot. Ask me how to navigate the platform, run simulations, or use the various AI modules (CORE, VOICE, PILOT).' }
+        { id: '1', type: 'bot', text: 'Namaste! I am the INDRA Intelligence Assistant. How can I assist you with using the platform today?' }
     ]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -91,41 +91,37 @@ export default function IndraBot() {
                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                        className="fixed bottom-6 right-6 w-[350px] h-[500px] bg-card/95 backdrop-blur-xl border border-border/50 shadow-2xl rounded-2xl flex flex-col z-50 overflow-hidden"
+                        className="fixed bottom-6 right-6 w-[360px] h-[480px] bg-card/95 backdrop-blur-xl border border-border/50 shadow-2xl rounded-3xl flex flex-col z-50 overflow-hidden ring-1 ring-white/20"
                     >
-                        {/* Header */}
-                        <div className="indra-gradient-hero p-4 flex items-center justify-between text-white shrink-0">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                                    <Bot className="w-5 h-5" />
+                        {/* Simple Header */}
+                        <div className="indra-gradient-hero shrink-0">
+                            <div className="p-4 py-3 flex items-center justify-between text-white border-b border-white/10">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center backdrop-blur-sm border border-white/30">
+                                        <Bot className="w-4 h-4" />
+                                    </div>
+                                    <h3 className="font-heading font-black text-[12px] uppercase tracking-tighter">INDRA Intelligence</h3>
                                 </div>
-                                <div>
-                                    <h3 className="font-heading font-semibold text-sm">System Help Chatbot</h3>
-                                    <p className="text-[10px] text-white/80">Support Guide</p>
-                                </div>
+                                <button onClick={() => setIsOpen(false)} className="w-7 h-7 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors">
+                                    <X className="w-4 h-4" />
+                                </button>
                             </div>
-                            <button
-                                onClick={() => setIsOpen(false)}
-                                className="w-8 h-8 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors"
-                            >
-                                <X className="w-4 h-4" />
-                            </button>
                         </div>
 
-                        {/* Messages */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                        {/* Messages Area */}
+                        <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
                             {messages.map((msg) => (
                                 <div
                                     key={msg.id}
                                     className={`flex gap-3 max-w-[85%] ${msg.type === 'user' ? 'ml-auto flex-row-reverse' : ''}`}
                                 >
-                                    <div className={`w-6 h-6 shrink-0 rounded-full flex items-center justify-center mt-1 ${msg.type === 'user' ? 'bg-primary/20 text-primary' : 'bg-secondary/20 text-secondary'
+                                    <div className={`w-6 h-6 shrink-0 rounded-full flex items-center justify-center mt-1 ${msg.type === 'user' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'
                                         }`}>
                                         {msg.type === 'user' ? <User className="w-3 h-3" /> : <Bot className="w-3 h-3" />}
                                     </div>
-                                    <div className={`p-3 rounded-2xl text-sm whitespace-pre-wrap ${msg.type === 'user'
+                                    <div className={`p-3 rounded-2xl text-[13px] leading-relaxed shadow-sm ${msg.type === 'user'
                                             ? 'bg-primary text-primary-foreground rounded-tr-none'
-                                            : 'bg-muted text-foreground rounded-tl-none border border-border/50'
+                                            : 'bg-white text-slate-700 rounded-tl-none border border-slate-100'
                                         }`}>
                                         {msg.text}
                                     </div>
@@ -134,21 +130,21 @@ export default function IndraBot() {
 
                             {isTyping && (
                                 <div className="flex gap-3 max-w-[85%]">
-                                    <div className="w-6 h-6 shrink-0 rounded-full flex items-center justify-center mt-1 bg-secondary/20 text-secondary">
+                                    <div className="w-6 h-6 shrink-0 rounded-full flex items-center justify-center mt-1 bg-secondary/10 text-secondary">
                                         <Bot className="w-3 h-3" />
                                     </div>
-                                    <div className="p-3 rounded-2xl bg-muted rounded-tl-none border border-border/50 flex items-center gap-1.5 h-10 w-16">
-                                        <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} className="w-1.5 h-1.5 rounded-full bg-secondary" />
-                                        <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full bg-secondary" />
-                                        <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full bg-secondary" />
+                                    <div className="p-3 rounded-2xl bg-white rounded-tl-none border border-slate-100 flex items-center gap-1.5 h-10 w-16">
+                                        <motion.div animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} className="w-1 h-1 rounded-full bg-slate-300" />
+                                        <motion.div animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} className="w-1 h-1 rounded-full bg-slate-300" />
+                                        <motion.div animate={{ y: [0, -3, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} className="w-1 h-1 rounded-full bg-slate-300" />
                                     </div>
                                 </div>
                             )}
                             <div ref={messagesEndRef} />
                         </div>
 
-                        {/* Input Form */}
-                        <div className="p-3 border-t border-border shrink-0 bg-background/50">
+                        {/* Input Area */}
+                        <div className="p-4 border-t border-border bg-background">
                             <form
                                 onSubmit={(e) => { e.preventDefault(); handleSend(); }}
                                 className="flex items-center gap-2"
@@ -157,7 +153,7 @@ export default function IndraBot() {
                                     type="text"
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
-                                    placeholder="How do I use this system?"
+                                    placeholder="Message INDRA Core..."
                                     className="flex-1 bg-muted border border-border rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-body"
                                 />
                                 <button

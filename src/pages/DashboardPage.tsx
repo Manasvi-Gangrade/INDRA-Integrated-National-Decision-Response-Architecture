@@ -5,6 +5,7 @@ import { useRole } from "@/contexts/RoleContext";
 import { Users, Activity, AlertTriangle, TrendingUp, Wifi, FileText, Image as ImageIcon } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 import indiaMap from "@/assets/india-map-bg.png";
+import { DigiLockerModal } from "@/components/DigiLockerModal";
 
 const sentimentData = [
   { month: "Jan", positive: 65, negative: 35 },
@@ -46,6 +47,7 @@ const DashboardPage = () => {
   const [feed, setFeed] = useState(liveFeed);
   const [alerts, setAlerts] = useState<any[]>(initialAlerts);
   const [isSimulating, setIsSimulating] = useState(false);
+  const [isDigiLockerOpen, setIsDigiLockerOpen] = useState(false);
 
   useEffect(() => {
     // Fetch live external data from backend
@@ -99,14 +101,22 @@ const DashboardPage = () => {
             <p className="text-sm text-foreground/80 font-medium">Logged in as: <span className="text-primary">{currentRole}</span></p>
           </div>
           {currentRole !== 'Citizen' && (
-            <button
-              onClick={simulateCrisis}
-              disabled={isSimulating}
-              className="px-4 py-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-bold shadow-lg hover:bg-destructive/90 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
-            >
-              {isSimulating ? <Activity className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />}
-              {isSimulating ? "Crisis Active..." : "Simulate Assam Flood"}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsDigiLockerOpen(true)}
+                className="px-4 py-2 rounded-lg bg-emerald-600/10 text-emerald-500 border border-emerald-500/30 text-sm font-bold shadow-sm hover:bg-emerald-600/20 transition-all active:scale-95 flex items-center gap-2"
+              >
+                <FileText className="w-4 h-4" /> Verify KYC (DigiLocker)
+              </button>
+              <button
+                onClick={simulateCrisis}
+                disabled={isSimulating}
+                className="px-4 py-2 rounded-lg bg-destructive text-destructive-foreground text-sm font-bold shadow-lg hover:bg-destructive/90 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
+              >
+                {isSimulating ? <Activity className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />}
+                {isSimulating ? "Crisis Active..." : "Simulate Assam Flood"}
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -238,6 +248,9 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
+      
+      {/* Insert DigiLocker Modal here */}
+      <DigiLockerModal isOpen={isDigiLockerOpen} onClose={() => setIsDigiLockerOpen(false)} />
     </div>
   );
 };
