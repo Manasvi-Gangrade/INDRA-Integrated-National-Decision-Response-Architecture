@@ -1,4 +1,4 @@
-import MetricCard from "@/components/MetricCard";
+import { MetricCard } from "@/components/MetricCard";
 import { AlertCard } from "@/components/AlertCard";
 import { useState, useEffect } from "react";
 import { useRole } from "@/contexts/RoleContext";

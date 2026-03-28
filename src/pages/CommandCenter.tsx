@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import MetricCard from '@/components/MetricCard';
+import { MetricCard } from '@/components/MetricCard';
 import StatusBadge from '@/components/StatusBadge';
 import { weatherAlerts, economicIndicators, grievanceData, schemeMetrics, monthlyTrendData, stateRiskData } from '@/data/mockData';
 import { AlertTriangle, TrendingUp, Users, FileBarChart, CheckCircle2, Activity, MapPin } from 'lucide-react';

@@ -29,7 +29,7 @@ if not BLAND_AI_KEY:
     print("WARNING: BLAND_AI_API_KEY is not set. Outbound calls will fail.")
 
 # Initialize Model
-model = genai.GenerativeModel('gemini-2.5-flash')
+model = genai.GenerativeModel('gemini-flash-latest')
 
 app = FastAPI(title="INDRA Intelligence API")
 
@@ -49,9 +49,14 @@ class SpeechRequest(BaseModel):
 class SentimentRequest(BaseModel):
     feedbacks: List[str]
 
+class ChatMessage(BaseModel):
+    role: str # "user" or "model"
+    content: str
+
 class ChatRequest(BaseModel):
     message: str
-    history: List[dict] = []
+    mode: str = "text"
+    history: List[ChatMessage] = []
 
 class CallRequest(BaseModel):
     phone_number: str
@@ -248,21 +253,51 @@ async def chat_with_indra(request: ChatRequest):
     if not API_KEY:
         raise HTTPException(status_code=500, detail="Gemini API Key is missing. Please configure backend/.env")
     
-    prompt = f"""
-    You are INDRA, the Integrated National Decision & Response Architecture AI Assistant.
-    You are the voice of the Global Ontology Engine which tracks live data across geopolitics, economics, defense, climate, and society for India.
-    Keep your responses concise, sharp, and highly professional, like an AI briefing a top government official.
-    If the user asks about a current crisis (like Assam Floods or Farmer issues), invent realistic, data-driven simulated insights as if you are pulling from live sensors and satellite feeds.
-    
-    User Query: {request.message}
-    """
-    
     try:
-        response = model.generate_content(prompt)
-        return {"response": response.text}
+        # Build prompt from history
+        chat_session = model.start_chat(history=[
+            {"role": "user" if msg.role == "user" else "model", "parts": [msg.content]}
+            for msg in request.history
+        ])
+
+        mode_instructions = ""
+        if request.mode == "graph":
+            mode_instructions = """
+            [INTELLIGENCE MODE: GRAPH]
+            1. Analyze the context (Assam Floods or any other topic mentioned).
+            2. Provide a 1-sentence analytical observation.
+            3. Then, return exactly 5 data points in JSON: [{"name": "Category", "value": number}].
+            4. Ensure 'value' numbers are realistic.
+            """
+        elif request.mode == "table":
+            mode_instructions = """
+            [INTELLIGENCE MODE: TABLE]
+            1. Analyze context.
+            2. Provide a 1-sentence strategic summary.
+            3. Then, provide a Markdown table with 3 columns relevant to the query.
+            """
+        elif request.mode == "search":
+            mode_instructions = """
+            [INTELLIGENCE MODE: SEARCH]
+            1. Summarize findings from NDMA/NITI Aayog/IMD silos.
+            2. List 3 verified intelligence sources.
+            """
+        elif request.mode == "image":
+            mode_instructions = """
+            [INTELLIGENCE MODE: IMAGE CONCEPT]
+            1. Describe a high-resolution satellite or thermal infrared visualization.
+            """
+
+        final_prompt = f"{mode_instructions}\n\nUser Intelligence Request: {request.message}"
+        response = chat_session.send_message(final_prompt)
+        
+        return {
+            "response": response.text,
+            "mode": request.mode
+        }
     except Exception as e:
         print("Chat Error:", str(e))
-        raise HTTPException(status_code=500, detail="Failed to generate AI response.")
+        raise HTTPException(status_code=500, detail=f"Failed to generate AI response: {str(e)}")
 
 @app.post("/api/voice/trigger-call")
 async def trigger_call(request: CallRequest):

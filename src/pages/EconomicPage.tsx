@@ -1,4 +1,4 @@
-import MetricCard from '@/components/MetricCard';
+import { MetricCard } from '@/components/MetricCard';
 import { economicIndicators, monthlyTrendData } from '@/data/mockData';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';

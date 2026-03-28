@@ -5,6 +5,7 @@ import IndraBot from "@/components/IndraBot";
 import MainChatbot from "@/components/MainChatbot";
 import LiveTicker from "@/components/LiveTicker";
 import NewsScrollingPanel from "@/components/NewsScrollingPanel";
+import QuickAccessBlocks from "@/components/QuickAccessBlocks";
 import mapBg from "@/assets/india-map-bg.png";
 import teamBanner from "@/assets/team-banner.png";
 import gallery1 from "@/assets/images/gallery1.jpeg";
@@ -130,6 +131,9 @@ const LandingPage = () => {
 
       {/* Main Chatbot Interface */}
       <MainChatbot />
+
+      {/* Quick Access Action Blocks */}
+      <QuickAccessBlocks />
 
       {/* Mainland Content (Modules) */}
       <section className="relative z-10 bg-card/50 backdrop-blur-3xl border-b border-border/50">

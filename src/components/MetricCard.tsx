@@ -53,4 +53,4 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, change, trend, ic
   );
 };
 
-export default MetricCard;
+export { MetricCard };
